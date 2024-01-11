@@ -1,0 +1,23 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the dataset
+data = pd.read_csv('path_to_your_file.csv')
+
+# Data Cleaning and Standardizing 'GPA' and 'weight'
+data['GPA'] = pd.to_numeric(data['GPA'], errors='coerce')
+data['weight'] = data['weight'].str.extract('(\d+)').astype(float)
+
+# Handling missing values
+missing_values = data.isnull().sum()
+missing_percentage = (missing_values / len(data)) * 100
+columns_to_drop = missing_percentage[missing_percentage > 30].index
+data_cleaned = data.drop(columns=columns_to_drop)
+for column in data_cleaned.columns:
+    if data_cleaned[column].dtype == 'object':
+        mode_value = data_cleaned[column].mode()[0]
+        data_cleaned[column].fillna(mode_value, inplace=True)
+    else:
+        median_value = data_cleaned[column].median()
+        data_cleaned[column].fillna(median_value, inplace=True)
